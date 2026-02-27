@@ -102,7 +102,7 @@ resource "aws_security_group" "web_sg" {
 resource "local_file" "inventory" {
   depends_on = [aws_instance.web, aws_instance.ubuntu_web]
 
-  filename = "${path.module}/ansible/inventory.ini"
+  filename = "${path.module}/inventory.ini"
   content  = templatefile("${path.module}/inventory.tpl", {
             public_ip = aws_instance.web.public_ip
             ubuntu_public_ip = aws_instance.ubuntu_web.public_ip
@@ -114,6 +114,6 @@ resource "null_resource" "run_ansible" {
         depends_on = [aws_instance.web, aws_instance.ubuntu_web, local_file.inventory]
 
         provisioner "local-exec" {
-                command = "sleep 40 && ansible-playbook -i ${path.module}/inventory.ini ${path.module}/ansible/ans_nginx.yml"
+                command = "sleep 40 && ansible-playbook -i ${path.module}/inventory.ini ${path.module}/ans_nginx.yml"
   }
 }
