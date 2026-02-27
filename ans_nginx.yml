@@ -1,0 +1,53 @@
+---
+- name: Install Nginx and Hello World on Linux
+  hosts: all
+  become: yes
+  gather_facts: no
+
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+  pre_tasks:
+    - name: Ensure Python is installed (required for Ansible)
+      raw: |
+        if command -v python3 >/dev/null 2>&1; then
+          echo "Python3 present"
+        else
+          if command -v apt-get >/dev/null 2>&1; then sudo apt-get update -y && sudo apt-get install -y python3;
+          elif command -v dnf >/dev/null 2>&1; then sudo dnf -y install python3;
+          elif command -v yum >/dev/null 2>&1; then sudo yum -y install python3;
+          fi
+        fi
+      changed_when: false
+
+    - name: Gather facts
+      setup:
+
+  tasks:
+    - name: Update apt cache (Ubuntu only)
+      apt:
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Install Nginx
+      package:
+        name: nginx
+        state: present
+
+    - name: Enable and start Nginx
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Deploy Hello World page
+      copy:
+        dest: /usr/share/nginx/html/index.html
+        content: |
+          <html>
+          <head><title>Terraform + Ansible + Linux + Nginx</title></head>
+          <body style="font-family: Arial; text-align:center; margin-top:50px;">
+            <h1>Hello World!</h1>
+            <h3>Nginx is installed on Linux</h3>
+          </body>
+          </html>
