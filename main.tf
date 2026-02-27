@@ -114,6 +114,6 @@ resource "null_resource" "run_ansible" {
         depends_on = [aws_instance.web, aws_instance.ubuntu_web, local_file.inventory]
 
         provisioner "local-exec" {
-                command = "sleep 40 && ansible-playbook -i ${path.module}/inventory.ini ${path.module}/ansible/nginx-amazon-linux.yml"
+                command = "sleep 40 && ansible-playbook -i ${path.module}/inventory.ini ${path.module}/ansible/ans_nginx.yml"
   }
 }
