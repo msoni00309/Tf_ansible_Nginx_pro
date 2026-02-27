@@ -1,4 +1,3 @@
-variables.tf
 variable "project_name"    {
         type = string
         default = "tf-ansible-nginx-web"
@@ -18,7 +17,7 @@ variable "secret_key" {
 }
 variable "ami_id" {
         type    = string
-        default = "ami-0b836304ab90d9e21"
+        default = "ami-0d8d3b1122e36c000"
 }
 variable "ubuntu_ami" {
         type = string
@@ -30,7 +29,7 @@ variable "instance_type"   {
 }
 variable "ssh_key_name"    {
         type = string
-} # existing AWS key pair name in global variable 
+} # existing AWS key pair name in global variable
 
 variable "allow_ssh_cidr"  {
         type = string
@@ -44,9 +43,8 @@ variable "tags" {
         type = map(string)
         default = { Owner = "MS", Env = "Dev" }
 }
-variable "pem_path" {
+variable "private_key_path" {
         description = "Absolute path to the SSH private key (.pem) used by Ansible/SSH"
         type        = string
-        default     = "~/tf-ansible-nginx-web/ansible/myRSA_SSH_Key.pem"
+        default     = "~/Tf_ansible_Nginx_pro/myRSA_SSH_Key.pem"
 }
-
