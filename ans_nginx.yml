@@ -2,29 +2,20 @@
 - name: Install Nginx and Hello World on Linux
   hosts: all
   become: yes
-  gather_facts: no
+  gather_facts: yes
 
   vars:
-    ansible_python_interpreter: /usr/bin/python3
+    # default for Debian/Ubuntu
+    web_root: "/var/www/html"
 
   pre_tasks:
-    - name: Ensure Python is installed (required for Ansible)
-      raw: |
-        if command -v python3 >/dev/null 2>&1; then
-          echo "Python3 present"
-        else
-          if command -v apt-get >/dev/null 2>&1; then sudo apt-get update -y && sudo apt-get install -y python3;
-          elif command -v dnf >/dev/null 2>&1; then sudo dnf -y install python3;
-          elif command -v yum >/dev/null 2>&1; then sudo yum -y install python3;
-          fi
-        fi
-      changed_when: false
-
-    - name: Gather facts
-      setup:
+    - name: Switch web root for RedHat-family distros
+      set_fact:
+        web_root: "/usr/share/nginx/html"
+      when: ansible_os_family == "RedHat"
 
   tasks:
-    - name: Update apt cache (Ubuntu only)
+    - name: Update apt repo cache (Ubuntu/Debian)
       apt:
         update_cache: yes
       when: ansible_os_family == "Debian"
@@ -40,9 +31,15 @@
         state: started
         enabled: yes
 
+    - name: Remove Ubuntu default nginx placeholder page
+      file:
+        path: /var/www/html/index.nginx-debian.html
+        state: absent
+      when: ansible_os_family == "Debian"
+
     - name: Deploy Hello World page
       copy:
-        dest: /usr/share/nginx/html/index.html
+        dest: "{{ web_root }}/index.html"
         content: |
           <html>
           <head><title>Terraform + Ansible + Linux + Nginx</title></head>
@@ -51,3 +48,6 @@
             <h3>Nginx is installed on Linux</h3>
           </body>
           </html>
+        owner: root
+        group: root
+        mode: "0644"
